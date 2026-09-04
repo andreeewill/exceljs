@@ -10,10 +10,77 @@ Reverse engineered from Excel spreadsheet files as a project.
 
 * [中文文档](README_zh.md)
 
+# About this fork
+
+This is `@andreeewill/exceljs`, a security-patched fork of
+[exceljs](https://github.com/exceljs/exceljs) 4.4.0. Upstream has not published
+a release carrying fixes for the advisories below (Snyk points at a 5.0.0 that
+does not exist on npm), so they are fixed here. Everything else is unchanged -
+the API is the same, only the package name differs.
+
+| Advisory | Severity | Fix in this fork |
+| --- | --- | --- |
+| [CVE-2026-78207](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234023) - prototype pollution via `cell.note` | Critical (9.3) | `deepMerge` refuses `__proto__` / `constructor` / `prototype` keys. Always on. |
+| [CVE-2026-78206](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234025) - decompression bomb in `xlsx.load()` | High (8.7) | Archive entries inflating more than 1000:1 are rejected before parsing. Tunable. |
+| [CVE-2026-78208](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234019) - path traversal via `addImage({filename})` | High (8.7) | Opt-in `mediaBaseDir` confines image reads to one directory. |
+| [CVE-2026-78209](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234021) - CSV injection in `csv.write()` | Medium (6.2) | Formula-leading text values are quoted on export. On by default. |
+
+Dependencies were also cleaned up: `unzipper` moved to `^0.12.5` (dropping the
+`binary` -> `chainsaw` -> `traverse@0.3.9` prototype-pollution chain and
+`fstream`), and the `uuid` dependency was replaced with a 40-line internal v4
+generator.
+
+## Security options
+
+### `csv.write` / `writeFile` / `writeBuffer`
+
+Text values starting with `=`, `+`, `-`, `@`, tab or carriage return are
+prefixed with a single quote so a spreadsheet will not evaluate them. Numbers
+and dates are untouched. **This is on by default** - it is the one behaviour
+change versus upstream 4.4.0. To restore the old output:
+
+```javascript
+await workbook.csv.writeFile('out.csv', {sanitizeFormulas: false});
+```
+
+### `xlsx.load` / `read` / `readFile`
+
+```javascript
+await workbook.xlsx.load(buffer, {
+  maxCompressionRatio: 1000,        // default; 0 disables the check
+  maxEntrySize: 200 * 1024 * 1024,  // optional, off by default
+  maxUncompressedSize: 1024 ** 3,   // optional, off by default
+});
+```
+
+The ratio check only applies to entries that inflate past 10 MB, so ordinary
+workbooks are unaffected.
+
+### `xlsx.write` / `writeFile` / `writeBuffer` and `WorkbookWriter`
+
+If any image filename can be influenced by a user, set `mediaBaseDir`. Image
+paths are then resolved against it and anything escaping it is rejected:
+
+```javascript
+await workbook.xlsx.writeFile('out.xlsx', {mediaBaseDir: '/srv/app/uploads'});
+
+const writer = new ExcelJS.stream.xlsx.WorkbookWriter({
+  filename: 'out.xlsx',
+  mediaBaseDir: '/srv/app/uploads',
+});
+```
+
+Without `mediaBaseDir` the pre-existing behaviour is kept and any readable path
+is accepted.
+
 # Installation
 
 ```shell
-npm install exceljs
+npm install @andreeewill/exceljs
+```
+
+```javascript
+const ExcelJS = require('@andreeewill/exceljs');
 ```
 
 # New Features!

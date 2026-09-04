@@ -1462,6 +1462,24 @@ export interface XlsxReadOptions {
 	 * The list of XML node names to ignore while parsing an XLSX file
 	 */
 	ignoreNodes: string[];
+
+	/**
+	 * Reject an archive entry whose uncompressed size exceeds this many bytes.
+	 * Unset by default. Guards against decompression bombs (CVE-2026-78206).
+	 */
+	maxEntrySize: number;
+
+	/**
+	 * Reject an archive whose entries total more than this many uncompressed
+	 * bytes. Unset by default. Guards against decompression bombs (CVE-2026-78206).
+	 */
+	maxUncompressedSize: number;
+
+	/**
+	 * Reject an archive entry that inflates by more than this ratio.
+	 * Defaults to 1000; set to 0 to disable (CVE-2026-78206).
+	 */
+	maxCompressionRatio: number;
 }
 
 export interface XlsxWriteOptions extends stream.xlsx.WorkbookWriterOptions {
@@ -1578,6 +1596,13 @@ export interface CsvWriteOptions {
 	map(value: any, index: number): any;
 	includeEmptyRows: boolean;
 	formatterOptions: Partial<FastCsvFormatterOptionsArgs>;
+
+	/**
+	 * Prefix text values that a spreadsheet would evaluate as a formula
+	 * (leading =, +, -, @, tab or CR) with a single quote.
+	 * Defaults to true; set to false for the pre-4.4 behaviour (CVE-2026-78209).
+	 */
+	sanitizeFormulas: boolean;
 }
 
 export interface Csv {
@@ -1935,6 +1960,13 @@ export namespace stream {
 			 * Styles can add some performance overhead. Default is false
 			 */
 			useStyles: boolean;
+
+			/**
+			 * If set, image filenames passed to addImage({filename}) are resolved
+			 * against this directory and rejected if they escape it.
+			 * Unset by default (CVE-2026-78208).
+			 */
+			mediaBaseDir: string;
 		}
 
 		interface ArchiverZipOptions {

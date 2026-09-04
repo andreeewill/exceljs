@@ -76,4 +76,42 @@ describe('under-dash', () => {
       }
     });
   });
+
+  describe('deepMerge', () => {
+    afterEach(() => {
+      delete Object.prototype.polluted;
+    });
+
+    it('merges nested objects and arrays', () => {
+      const target = {a: {b: 1}, list: [1, 2]};
+      const result = _.deepMerge(target, {a: {c: 2}, list: [9]}, {d: 3});
+      expect(result).to.equal(target);
+      expect(result.a).to.deep.equal({b: 1, c: 2});
+      expect(result.list).to.deep.equal([9, 2]);
+      expect(result.d).to.equal(3);
+    });
+
+    it('ignores undefined values', () => {
+      expect(_.deepMerge({a: 1}, {a: undefined})).to.deep.equal({a: 1});
+    });
+
+    // CVE-2026-78207
+    it('does not pollute Object.prototype via __proto__', () => {
+      _.deepMerge({}, JSON.parse('{"__proto__": {"polluted": "yes"}}'));
+      expect({}.polluted).to.equal(undefined);
+    });
+
+    it('does not pollute Object.prototype via nested __proto__', () => {
+      _.deepMerge({}, JSON.parse('{"a": {"__proto__": {"polluted": "yes"}}}'));
+      expect({}.polluted).to.equal(undefined);
+    });
+
+    it('does not pollute Object.prototype via constructor.prototype', () => {
+      _.deepMerge(
+        {},
+        JSON.parse('{"constructor": {"prototype": {"polluted": "yes"}}}')
+      );
+      expect({}.polluted).to.equal(undefined);
+    });
+  });
 });

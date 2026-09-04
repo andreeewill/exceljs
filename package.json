@@ -1,7 +1,7 @@
 {
-  "name": "exceljs",
-  "version": "4.4.0",
-  "description": "Excel Workbook Manager - Read and Write xlsx and csv Files.",
+  "name": "@andreeewill/exceljs",
+  "version": "5.0.0",
+  "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Security-patched fork of exceljs.",
   "private": false,
   "license": "MIT",
   "author": {
@@ -10,7 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/exceljs/exceljs.git"
+    "url": "git+https://github.com/andreeewill/exceljs.git"
+  },
+  "homepage": "https://github.com/andreeewill/exceljs#readme",
+  "bugs": {
+    "url": "https://github.com/andreeewill/exceljs/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=8.3.0"
@@ -103,8 +110,7 @@
     "readable-stream": "^3.6.0",
     "saxes": "^5.0.1",
     "tmp": "^0.2.0",
-    "unzipper": "^0.10.11",
-    "uuid": "^8.3.0"
+    "unzipper": "^0.12.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
