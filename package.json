@@ -1,6 +1,6 @@
 {
   "name": "@andreeewill/exceljs",
-  "version": "5.0.1",
+  "version": "5.0.3",
   "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Security-patched fork of exceljs.",
   "private": false,
   "license": "MIT",
@@ -103,7 +103,7 @@
     "pageSetup"
   ],
   "dependencies": {
-    "archiver": "^5.0.0",
+    "archiver": "^7.0.0",
     "dayjs": "^1.8.34",
     "fast-csv": "^4.3.1",
     "jszip": "^3.10.1",
