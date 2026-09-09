@@ -25,10 +25,20 @@ the API is the same, only the package name differs.
 | [CVE-2026-78208](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234019) - path traversal via `addImage({filename})` | High (8.7) | Opt-in `mediaBaseDir` confines image reads to one directory. |
 | [CVE-2026-78209](https://security.snyk.io/vuln/SNYK-JS-EXCELJS-19234021) - CSV injection in `csv.write()` | Medium (6.2) | Formula-leading text values are quoted on export. On by default. |
 
-Dependencies were also cleaned up: `unzipper` moved to `^0.12.5` (dropping the
-`binary` -> `chainsaw` -> `traverse@0.3.9` prototype-pollution chain and
-`fstream`), and the `uuid` dependency was replaced with a 40-line internal v4
-generator.
+Dependencies were also cleaned up. `unzipper` is installed under an npm alias,
+`"unzipper": "npm:@andreeewill/unzipper@^1.0.0"`, so `require('unzipper')` keeps
+working unchanged while resolving to
+[@andreeewill/unzipper](https://www.npmjs.com/package/@andreeewill/unzipper), a
+maintained fork of [unzipper](https://github.com/ZJONSSON/node-unzipper) 0.12.5.
+This drops the `binary` -> `chainsaw` -> `traverse@0.3.9` prototype-pollution
+chain and `fstream`, and clears the stale
+[SNYK-JS-UNZIPPER-18365659](https://security.snyk.io/vuln/SNYK-JS-UNZIPPER-18365659)
+Zip Slip advisory, whose affected range still lists every `unzipper` version
+even though the fix (`path.relative` containment guard) shipped in 0.12.5. That
+advisory was never reachable from ExcelJS in any case - only `unzipper`'s
+streaming parser (`unzip.Parse`) is used, never the `Extract()` /
+`Open().extract()` sinks the flaw lives in. The `uuid` dependency was replaced
+with a 40-line internal v4 generator.
 
 ## Security options
 
