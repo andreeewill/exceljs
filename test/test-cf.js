@@ -1,4 +1,4 @@
-const Excel = require('../lib/exceljs.nodejs.js');
+const Excel = require('../lib/exceljs.nodejs');
 const Range = require('../lib/doc/range');
 
 const HrStopwatch = require('./utils/hr-stopwatch');
@@ -39,8 +39,10 @@ function addDateTable(ws, ref) {
   const now = Date.now();
   const today = now - (now % DAY);
   let dt = new Date(today);
-  const sow = today - ( (dt.getDay() - 1) * DAY );
-  const som = sow - (28 * DAY);
+  const weekOffset = (dt.getDay() - 1) * DAY;
+  const sow = today - weekOffset;
+  const fourWeeks = 28 * DAY;
+  const som = sow - fourWeeks;
   dt = new Date(som);
 
   for (let i = 1; i <= 9; i++) {

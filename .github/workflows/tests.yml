@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [10.x, 12.x, 14.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [22.13.0, 22.x, 24.x, 26.x]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
@@ -38,10 +38,11 @@ jobs:
           key: v1-${{ runner.os }}-node-${{ matrix.node-version }}-npm-${{ hashFiles('**/package.json') }}
           restore-keys: |
             v1-${{ runner.os }}-node-${{ matrix.node-version }}-npm-
-      - run: npm install
+      - run: npm ci
       - run: npm test
         env:
           CI: true
+      - run: npm run test:package
 
   benchmark:
     timeout-minutes: 15
@@ -52,7 +53,7 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #latest v4. TODO upgrade
       - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d #latest  v3. TODO upgrade
         with:
-          node-version: 18
+          node-version: 22
       - name: Create the npm cache directory
         run: mkdir npm-cache && npm config set cache ./npm-cache --global
       - name: Cache node modules
@@ -62,7 +63,7 @@ jobs:
           key: v1-npm-${{ hashFiles('**/package.json') }}
           restore-keys: |
             v1-npm-
-      - run: npm install
+      - run: npm ci
       - run: npm run benchmark
         env:
           CI: true
@@ -76,7 +77,7 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #latest v4. TODO upgrade
       - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d #latest  v3. TODO upgrade
         with:
-          node-version: 18
+          node-version: 22
       - name: Create the npm cache directory
         run: mkdir npm-cache && npm config set cache ./npm-cache --global
       - name: Cache node modules
@@ -86,7 +87,7 @@ jobs:
           key: v1-npm-${{ hashFiles('**/package.json') }}
           restore-keys: |
             v1-npm-
-      - run: npm install
+      - run: npm ci
       - run: npm install typescript
       - run: tsc index.d.ts
         env:

@@ -1,6 +1,6 @@
 {
   "name": "@andreeewill/exceljs",
-  "version": "5.0.3",
+  "version": "6.0.0",
   "description": "Excel Workbook Manager - Read and Write xlsx and csv Files. Security-patched fork of exceljs.",
   "private": false,
   "license": "MIT",
@@ -20,7 +20,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=22.13.0"
   },
   "main": "./excel.js",
   "browser": "./dist/exceljs.min.js",
@@ -28,6 +28,7 @@
   "files": [
     "dist",
     "lib",
+    "scripts/prepare-archiver-bundle.js",
     "excel.js",
     "LICENSE",
     "README.md",
@@ -36,6 +37,8 @@
     "index.d.ts"
   ],
   "scripts": {
+    "prepack": "node scripts/prepare-archiver-bundle.js",
+    "test:package": "node scripts/test-package.js",
     "test": "npm run test:full",
     "test:es5": "export EXCEL_BUILD=es5 && npm run test:full",
     "test:full": "npm run build && npm run test:unit && npm run test:integration && npm run test:end-to-end && npm run test:jasmine",
@@ -103,7 +106,7 @@
     "pageSetup"
   ],
   "dependencies": {
-    "archiver": "^7.0.0",
+    "archiver": "8.0.0",
     "dayjs": "^1.8.34",
     "fast-csv": "^4.3.1",
     "jszip": "^3.10.1",
@@ -111,6 +114,14 @@
     "saxes": "^5.0.1",
     "tmp": "^0.2.0",
     "unzipper": "npm:@andreeewill/unzipper@^1.0.0"
+  },
+  "bundleDependencies": [
+    "archiver"
+  ],
+  "overrides": {
+    "readdir-glob": {
+      "minimatch": "11.0.1"
+    }
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",

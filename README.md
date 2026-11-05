@@ -4,6 +4,8 @@
 
 Read, manipulate and write spreadsheet data and styles to XLSX and JSON.
 
+See the [changelog](CHANGELOG.md) for changes and upgrade instructions for this fork.
+
 Reverse engineered from Excel spreadsheet files as a project.
 
 # Translations
@@ -15,8 +17,8 @@ Reverse engineered from Excel spreadsheet files as a project.
 This is `@andreeewill/exceljs`, a security-patched fork of
 [exceljs](https://github.com/exceljs/exceljs) 4.4.0. Upstream has not published
 a release carrying fixes for the advisories below (Snyk points at a 5.0.0 that
-does not exist on npm), so they are fixed here. Everything else is unchanged -
-the API is the same, only the package name differs.
+does not exist on npm), so they are fixed here. The workbook API is preserved;
+this fork requires Node.js 22.13.0 or newer.
 
 | Advisory | Severity | Fix in this fork |
 | --- | --- | --- |
@@ -39,6 +41,21 @@ advisory was never reachable from ExcelJS in any case - only `unzipper`'s
 streaming parser (`unzip.Parse`) is used, never the `Extract()` /
 `Open().extract()` sinks the flaw lives in. The `uuid` dependency was replaced
 with a 40-line internal v4 generator.
+
+The streaming writer uses Archiver 8.0.0. Its dependency tree is bundled into
+the npm package with `readdir-glob` using minimatch 11.0.1 and brace-expansion
+5.0.12 or newer. This addresses the reported minimatch amplification and
+brace-expansion recursion/ReDoS findings on the Archiver paths. Bundling is
+required because npm ignores a library's overrides when installing it as a
+dependency. The `prepack` script checks the tested dependency versions and
+updates the bundled `readdir-glob` manifest to declare minimatch 11.0.1;
+its source and license are unchanged. Consumers do not need to configure
+overrides themselves. Release packages must be built with lifecycle scripts
+enabled; run `npm ci`, `npm run build`, and `npm run test:package` before publishing.
+
+Node.js 22.13.0 or newer is required to load Archiver's ESM exports from this
+CommonJS library while keeping `new WorkbookWriter()` synchronous. Older Node
+versions are no longer supported, including through the ES5 entry point.
 
 ## Security options
 
